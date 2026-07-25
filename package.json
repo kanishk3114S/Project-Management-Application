@@ -1,0 +1,25 @@
+{
+  "name": "project_management_system",
+  "version": "1.0.0",
+  "description": "A project management application with full backend",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js",
+    "type": "module"
+  },
+  "keywords": [
+    "First",
+    "Backend",
+    "project",
+    "API",
+    "API",
+    "creation",
+    "full",
+    "creation"
+  ],
+  "author": "\"Kanishk Sharma\"",
+  "license": "ISC",
+  "devDependencies": {
+    "prettier": "3.9.6"
+  }
+}
