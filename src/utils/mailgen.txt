@@ -1,0 +1,38 @@
+/*
+📌 Mailgen (3-Point Summary)
+What is Mailgen?
+Mailgen is a Node.js library used to generate professional-looking HTML email templates automatically.
+Why use it?
+Instead of writing HTML/CSS for every email, you provide the content (name, intro, button, outro, etc.), and Mailgen generates a clean, responsive email template.
+Common Use Cases
+Sending welcome emails, email verification links, password reset emails, OTP emails, order confirmations, and other transactional emails.
+*/
+
+
+// a mailgen email contructor which will construct the emails // 
+//mailgen --> html mail generator//
+
+// const email = emailVerificationMailGen(username , emailURL); //mail object//
+// const html = MailGenerator.generate(email); //HTML file contains this email//
+
+/*
+emailVerificationMailGen() BACKEND receives THE object
+        │
+        ▼
+Creates a mail object
+        │
+        ▼
+mailGenerator.generate(mailObject)
+        │
+        ▼
+Converts it into HTML
+        │
+        ▼
+const html = ...
+        │
+        ▼
+Nodemailer sends the HTML email
+        │
+        ▼
+User receives the email
+*/

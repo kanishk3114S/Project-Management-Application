@@ -1,0 +1,24 @@
+//THE BASIC ROUTING OF HOW API-ERRORS AND RESPONSES WORK//
+
+"We create ApiResponse and ApiError so that every success and error response is converted into a consistent JSON format before sending it to the frontend."
+
+//every ROUTE should send the same format//
+
+Frontend
+     │
+     │ Request
+     ▼
+Backend Route
+     │
+     │ Something goes wrong
+     ▼
+throw new ApiError(404, "User not found")
+     │
+     ▼
+Error Handling Middleware
+     │
+     ▼
+Converts ApiError into JSON
+     │
+     ▼
+Frontend receives the JSON response

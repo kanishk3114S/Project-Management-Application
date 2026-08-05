@@ -1,0 +1,29 @@
+How the routing works
+
+Frontend
+   │
+   ▼
+app.js
+(Main Gate)
+   │
+   ▼
+Middleware
+(Check every request)
+   │
+   ▼
+Router
+(Choose the correct controller)
+   │
+   ▼
+Controller 🧠
+(Do the actual work)
+   │
+   ▼
+Database / File System / APIs
+   │
+   ▼
+ApiResponse / ApiError
+(Standard JSON format)
+   │
+   ▼
+Frontend
