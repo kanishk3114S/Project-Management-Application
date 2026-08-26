@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import authRouter from "./routes/user.routes.js"
+import cookieParser from 'cookie-parser'
 
 const app = express()
 
@@ -25,6 +26,7 @@ app.use(
 
 import healthCheckRoutes from "./routes/health.routes.js"
 import hamaraRouter from './routes/user.routes.js';
+app.use(cookieParser());
 
 //middleware//
 app.use("/api/v1/healthcheck", healthCheckRoutes);
