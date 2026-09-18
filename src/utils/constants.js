@@ -4,6 +4,7 @@ export const userRoleEnum = {
     MEMBER : "member",
 }
 
+//array of roles//
 export const AvailableUserRole = Object.values(userRoleEnum); //now we have extracted all the values from the arrays to store into this
 
 export const TaskStatusEnum = {

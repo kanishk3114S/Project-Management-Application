@@ -1,7 +1,12 @@
 import express from 'express'
 import cors from 'cors'
-import authRouter from "./routes/user.routes.js"
+import hamaraRouter from "./routes/user.routes.js"
+import ourRouter from "./routes/project.routes.js"
+import taskRouter from "./routes/task.routes.js"
+import noteRouter from "./routes/note.routes.js"
+import healthCheckRoutes from "./routes/health.routes.js"
 import cookieParser from 'cookie-parser'
+import { ApiError } from "./utils/api-error.js"
 
 const app = express()
 
@@ -22,20 +27,40 @@ app.use(
   })
 );
 
-//Importing the route//
-
-import healthCheckRoutes from "./routes/health.routes.js"
-import hamaraRouter from './routes/user.routes.js';
 app.use(cookieParser());
 
 //middleware//
 app.use("/api/v1/healthcheck", healthCheckRoutes);
 app.use("/api/v1/users", hamaraRouter);
+app.use("/api/v1/auth", hamaraRouter); // alias for PRD endpoint structure
+app.use("/api/v1/projects" , ourRouter);
+app.use("/api/v1/tasks", taskRouter);
+app.use("/api/v1/notes", noteRouter);
 
 app.get('/' , (req,res)=>{
 
     res.send("Hello Ji");
 
+});
+
+// Global Error Handler Middleware
+app.use((err, req, res, next) => {
+    let error = err;
+    if (!(error instanceof ApiError)) {
+        const statusCode = error.statusCode || 500;
+        const message = error.message || "Internal Server Error";
+        error = new ApiError(statusCode, message, error?.errors || [], err.stack);
+    }
+
+    const response = {
+        statusCode: error.statusCode,
+        message: error.message,
+        errors: error.errors,
+        data: null,
+        success: false
+    };
+
+    return res.status(error.statusCode).json(response);
 });
 
 

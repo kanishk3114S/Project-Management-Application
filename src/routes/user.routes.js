@@ -13,14 +13,15 @@ hamaraRouter.route("/reset-password/:resetToken").post(userResetForgotValidator(
 
 //secure routes//
 hamaraRouter.route("/logout").post(verifyUser ,  Logout);
-hamaraRouter.route("/currentUser").get(verifyUser , currUser)
+hamaraRouter.route("/currentUser").get(verifyUser , currUser);
+hamaraRouter.route("/current-user").get(verifyUser , currUser);
 hamaraRouter.route("/verify-email/:verificationToken").get(verifyEmail) //verify the email of the user//
 hamaraRouter.route("/resend-verification-email").post(verifyUser , resendVerificationEmail) //resend the verification email//
-hamaraRouter.route("/refresh-token").get(verifyUser , newAccessAndRefreshToken) //refresh the access and refresh token//
+hamaraRouter.route("/resend-email-verification").post(verifyUser , resendVerificationEmail);
+hamaraRouter.route("/refresh-token").post(newAccessAndRefreshToken).get(newAccessAndRefreshToken) //refresh the access and refresh token//
 hamaraRouter
     .route("/change-password")
     .post(verifyUser , userChangeCurrentPasswordValidator() , validate , changeCurrentPassword )
 
-
+export { hamaraRouter };
 export default hamaraRouter;
-

@@ -4,6 +4,7 @@ import { ApiError } from "../utils/api-error.js"
 import { AsyncHandler } from "../utils/async-handler.js"
 import { emailVerificationMailGen, forgotPassMailGen, sendEmail } from "../utils/mail.util.js"
 import jwt from "jsonwebtoken"
+import crypto from "crypto"
 
 //because of assync handler we dont want to wrtie the try-catch every time//
 
@@ -118,7 +119,7 @@ const newAccessAndRefreshToken = AsyncHandler(async(req,res)=>{
             throw new ApiError(401 , "Refresh token is invalid")
         }
 
-        const {accessToken , newRefreshToken} = await genAccessAndRefreshToken(user._id);
+        const {accessToken , refreshToken: newRefreshToken} = await genAccessAndRefreshToken(user._id);
 
         user.refreshToken = newRefreshToken;
         user.accessToken = accessToken;
@@ -152,11 +153,13 @@ const newAccessAndRefreshToken = AsyncHandler(async(req,res)=>{
 const Login = AsyncHandler(async(req,res)=>{
     const {email , username , password} = req.body; //take only these 3 paramters from the req//
 
-    if (!email) { //if we found email not-valid just throw the error//
-        throw new ApiError(400 , "Please enter the correct email-data")
+    if (!email && !username) { //if we found email/username not-valid just throw the error//
+        throw new ApiError(400 , "Please enter email or username")
     }
 
-    const user = await User.findOne({email});
+    const user = await User.findOne({
+        $or: [{ email: email || "" }, { username: username || "" }]
+    });
 
     if(!user) {
         throw new ApiError(400 , "User not found");       
@@ -247,7 +250,7 @@ const verifyEmail = AsyncHandler(async(req,res)=>{
     })
 
     if (!user) {
-        throw new ApiError("no new user is foundOut");
+        throw new ApiError(400, "Invalid verification token or token expired");
     }
 
     //cleanUp//
@@ -262,7 +265,7 @@ const verifyEmail = AsyncHandler(async(req,res)=>{
     //user ko find karo phir use save kardo//
 
     return res.status(200).json(
-        new ApiResponse(200 , "email is being verified")
+        new ApiResponse(200 , {} , "email is being verified")
     )
 
 })
@@ -285,17 +288,17 @@ const resendVerificationEmail = AsyncHandler(async(req,res)=>{
 
     await user.save({validateBeforeSave : false});
 
-        await sendEmail({
-        email: theUser?.email,
+    await sendEmail({
+        email: user?.email,
         subject: "Please verify your email",
         mailGenContent : emailVerificationMailGen(
-            theUser.username,
+            user.username,
             `${req.protocol}://${req.get("host")}/api/v1/users/verify-email/${unHashedToken}`
         ),
     })
 
     return res.status(200).json(
-        new ApiResponse(200 , "Verification email has been sent successfully")
+        new ApiResponse(200 , {} , "Verification email has been sent successfully")
     )
 
 })
@@ -317,14 +320,17 @@ export const forgotPasswordRequest = AsyncHandler(async(req,res)=>{
 
     const {unHashedToken , hashedToken , tokenExpiry} = user.generateTempToken(); //model utility that's why we are calling this with 
 
+    user.forgotPasswordToken = hashedToken;
+    user.forgotPassExp = tokenExpiry;
+
     await user.save({validateBeforeSave : false});
 
-        await sendEmail({
-        email: theUser?.email,
-        subject: "Please verify your email",
+    await sendEmail({
+        email: user?.email,
+        subject: "Password Reset Request",
         mailGenContent : forgotPassMailGen(
-            theUser.username,
-            `${process.env.FORGOT_PASSWORD_REDIRECT_URL}/${unHashedToken}`,
+            user.username,
+            `${process.env.FORGOT_PASSWORD_REDIRECT_URL || "http://localhost:3000/forgot-password"}/${unHashedToken}`,
         ),  
     });
 
@@ -344,18 +350,18 @@ export const resetForgotPassword = AsyncHandler(async(req,res)=>{
         throw new ApiError(401 , "input field is Invalid")
     }
 
-    const hashedToken = crypto.createHashe("sha256").update(resetToken).digest("hex")
+    const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex")
 
-    const user = await user.findOne({
+    const user = await User.findOne({
         forgotPasswordToken : hashedToken,
-        forgotPasswordExpiry : {$gt : Date.now()}
+        forgotPassExp : {$gt : Date.now()}
     })
 
     if (!user) {
-        throw new ApiError(403 , "user is not found")
+        throw new ApiError(403 , "user is not found or token has expired")
     }
 
-    user.forgotPasswordExpiry = undefined;
+    user.forgotPassExp = undefined;
     user.forgotPasswordToken = undefined;
 
     user.password = newPassword //our preHook will hash it instantly so no worries about 
@@ -377,18 +383,23 @@ export const changeCurrentPassword = AsyncHandler(async(req,res)=>{
 
     const {oldPassword , newPassword} = req.body
 
-    const user = await user.findById(req.body?._id);
+    const user = await User.findById(req.user?._id);
 
     if (!user) {
         throw new ApiError(401 , "user not found")
+    }
+
+    const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
+    if (!isPasswordCorrect) {
+        throw new ApiError(400 , "Invalid old password")
     }
 
     if (oldPassword === newPassword) {
         throw new ApiError(401 , "new password can not be equal to the old password")
     }
 
-    user.passsword = newPassword
-    await user.save({validateBeforeSave : false})
+    user.password = newPassword
+    await user.save()
 
     return res.status(200).json(
         new ApiResponse(200 , {} , "the user password has been changed successfully")
@@ -400,4 +411,4 @@ export const changeCurrentPassword = AsyncHandler(async(req,res)=>{
 
 
 
-export {registerUser , Login , Logout , currUser , verifyEmail , resendVerificationEmail , newAccessAndRefreshToken};
+export {registerUser , Login , Logout , currUser , verifyEmail , resendVerificationEmail , newAccessAndRefreshToken};
