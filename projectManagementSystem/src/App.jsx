@@ -5,6 +5,7 @@ import RegisterPage from "./pages/RegisterPage";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import DashboardPage from "./pages/DashboardPage";
+import ProjectDetailPage from "./pages/ProjectDetailPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 function App() {
@@ -22,6 +23,14 @@ function App() {
         element={
           <ProtectedRoute>
             <DashboardPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/project/:projectId" 
+        element={
+          <ProtectedRoute>
+            <ProjectDetailPage />
           </ProtectedRoute>
         } 
       />
