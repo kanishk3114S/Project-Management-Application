@@ -263,7 +263,7 @@ const getProjectMembers = AsyncHandler(async(req,res)=>{
         } , {
             $addFields : {
                 user : {
-                    $arrayElementAt: ["$user" , 0]
+                    $arrayElemAt: ["$user" , 0]
                 }
             }
         } , {

@@ -136,7 +136,7 @@ const newAccessAndRefreshToken = AsyncHandler(async(req,res)=>{
 
         const options = {
             httpOnly : true,
-            secure : true
+            secure : true, sameSite: "none"
         }
             return res
                 .status(200)
@@ -187,7 +187,7 @@ const Login = AsyncHandler(async(req,res)=>{
 
     const options = { //create the secure cookies//
         httpOnly : true,
-        secure : true,
+        secure : true, sameSite: "none"
     }
 
     return res
@@ -221,7 +221,7 @@ const Logout = AsyncHandler(async(req,res)=>{
 
     const options = {
         httpOnly : true,
-        secure : true
+        secure : true, sameSite: "none"
     }
 
     return res
@@ -428,3 +428,46 @@ export const changeCurrentPassword = AsyncHandler(async(req,res)=>{
 
 
 export {registerUser , Login , Logout , currUser , verifyEmail , resendVerificationEmail , newAccessAndRefreshToken};
+
+export const updateAccountDetails = AsyncHandler(async(req, res) => {
+    const { fullName, username } = req.body;
+    
+    if (!fullName && !username) {
+        throw new ApiError(400, "Please provide fullName or username to update");
+    }
+    
+    const user = await User.findById(req.user._id);
+    
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    if (fullName) {
+        user.fullName = fullName;
+    }
+    
+    if (username) {
+        const existingUser = await User.findOne({ username, _id: { $ne: req.user._id } });
+        if (existingUser) {
+            throw new ApiError(409, "Username is already taken");
+        }
+        user.username = username;
+    }
+
+    await user.save({ validateBeforeSave: false });
+
+    const updatedUser = await User.findById(user._id).select("-password -refreshToken -emailVerificationToken -emailVerificationExp");
+
+    return res.status(200).json(
+        new ApiResponse(200, updatedUser, "Account details updated successfully")
+    );
+});
+
+export const getAllUsers = AsyncHandler(async(req, res) => {
+    // Fetch all users to populate dropdowns, excluding sensitive information
+    const users = await User.find({}).select("_id username fullName email avatar");
+    
+    return res.status(200).json(
+        new ApiResponse(200, users, "Users fetched successfully")
+    );
+});

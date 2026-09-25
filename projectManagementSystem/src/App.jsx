@@ -6,6 +6,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import DashboardPage from "./pages/DashboardPage";
 import ProjectDetailPage from "./pages/ProjectDetailPage";
+import ProfilePage from "./pages/ProfilePage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 function App() {
@@ -23,6 +24,14 @@ function App() {
         element={
           <ProtectedRoute>
             <DashboardPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/profile" 
+        element={
+          <ProtectedRoute>
+            <ProfilePage />
           </ProtectedRoute>
         } 
       />

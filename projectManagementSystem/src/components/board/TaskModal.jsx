@@ -1,26 +1,41 @@
 import { useState, useEffect } from "react";
 import { X, Loader2 } from "lucide-react";
+import { useParams } from "react-router-dom";
+import api from "../../api/axios";
 
 export default function TaskModal({ isOpen, onClose, onSave, initialData, defaultStatus }) {
+  const { projectId } = useParams();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     status: "todo",
+    assignedTo: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [members, setMembers] = useState([]);
+
+  useEffect(() => {
+    if (isOpen && projectId) {
+      api.get(`/projects/${projectId}/members`)
+        .then(res => setMembers(res.data.data || []))
+        .catch(console.error);
+    }
+  }, [isOpen, projectId]);
 
   useEffect(() => {
     if (initialData) {
       setFormData({
         title: initialData.title || "",
         description: initialData.description || "",
-        status: initialData.status || "todo"
+        status: initialData.status || "todo",
+        assignedTo: initialData.assignedTo?._id || initialData.assignedTo || ""
       });
     } else {
       setFormData({
         title: "",
         description: "",
         status: defaultStatus || "todo",
+        assignedTo: ""
       });
     }
   }, [initialData, defaultStatus, isOpen]);
@@ -74,13 +89,27 @@ export default function TaskModal({ isOpen, onClose, onSave, initialData, defaul
             />
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-zinc-300">Status</label>
-            <select name="status" value={formData.status} onChange={handleChange} className="w-full bg-zinc-950/50 border border-white/10 rounded-lg px-4 py-2 text-sm text-zinc-100">
-              <option value="todo">To Do</option>
-              <option value="in_progress">In Progress</option>
-              <option value="done">Done</option>
-            </select>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-zinc-300">Status</label>
+              <select name="status" value={formData.status} onChange={handleChange} className="w-full bg-zinc-950/50 border border-white/10 rounded-lg px-4 py-2 text-sm text-zinc-100 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50">
+                <option value="todo">To Do</option>
+                <option value="in_progress">In Progress</option>
+                <option value="done">Done</option>
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-zinc-300">Assign To</label>
+              <select name="assignedTo" value={formData.assignedTo} onChange={handleChange} className="w-full bg-zinc-950/50 border border-white/10 rounded-lg px-4 py-2 text-sm text-zinc-100 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50">
+                <option value="">Unassigned</option>
+                {members.map(member => (
+                  <option key={member.user?._id || member._id} value={member.user?._id || member._id}>
+                    {member.user?.fullName || member.user?.username || 'Unknown User'}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/5 mt-6">

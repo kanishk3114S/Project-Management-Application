@@ -13,7 +13,15 @@ export function ProjectProvider({ children }) {
       try {
         const response = await api.get('/projects');
         // Extract array from backend ApiResponse structure (response.data.data)
-        setProjects(Array.isArray(response.data.data) ? response.data.data : []);
+        const rawProjects = Array.isArray(response.data.data) ? response.data.data : [];
+        // The backend returns an array of { project: {...}, role: '...' }
+        const normalizedProjects = rawProjects.map(item => {
+          if (item.project) {
+             return { ...item.project, role: item.role };
+          }
+          return item;
+        });
+        setProjects(normalizedProjects);
       } catch (error) {
         console.error("Error fetching projects:", error);
       } finally {

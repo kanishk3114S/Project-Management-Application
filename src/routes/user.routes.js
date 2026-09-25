@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { Logout, registerUser , currUser, verifyEmail, resendVerificationEmail , newAccessAndRefreshToken, forgotPasswordRequest, resetForgotPassword, changeCurrentPassword } from "../controllers/auth.user.js";
+import { Logout, registerUser , currUser, verifyEmail, resendVerificationEmail , newAccessAndRefreshToken, forgotPasswordRequest, resetForgotPassword, changeCurrentPassword, updateAccountDetails, getAllUsers } from "../controllers/auth.user.js";
 import { validate } from "../middlewares/validator.middleware.js";
 import { userRegisterValidator, userLoginValidator , userForgotPasswordValidator , userResetForgotValidator, userChangeCurrentPasswordValidator } from "../validators/index.js";
 import { Login } from "../controllers/auth.user.js";
@@ -22,6 +22,9 @@ hamaraRouter.route("/refresh-token").post(newAccessAndRefreshToken).get(newAcces
 hamaraRouter
     .route("/change-password")
     .post(verifyUser , userChangeCurrentPasswordValidator() , validate , changeCurrentPassword )
+
+hamaraRouter.route("/update-account").put(verifyUser, updateAccountDetails);
+hamaraRouter.route("/all").get(verifyUser, getAllUsers);
 
 export { hamaraRouter };
 export default hamaraRouter;

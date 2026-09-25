@@ -1,10 +1,32 @@
-import { useState } from "react";
-import { X, Mail, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, Mail, Loader2, Users } from "lucide-react";
+import api from "../../api/axios";
 
 export default function AddMemberModal({ isOpen, onClose, onInvite }) {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("member");
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Users state
+  const [allUsers, setAllUsers] = useState([]);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      const fetchUsers = async () => {
+        setIsLoadingUsers(true);
+        try {
+          const response = await api.get('/users/all');
+          setAllUsers(response.data.data || []);
+        } catch (error) {
+          console.error("Failed to fetch users", error);
+        } finally {
+          setIsLoadingUsers(false);
+        }
+      };
+      fetchUsers();
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -40,19 +62,24 @@ export default function AddMemberModal({ isOpen, onClose, onInvite }) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-zinc-300">Email Address</label>
+            <label className="text-sm font-medium text-zinc-300">Select User (Email)</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail className="h-4 w-4 text-zinc-500" />
+                <Users className="h-4 w-4 text-zinc-500" />
               </div>
-              <input 
-                type="email" 
+              <select 
                 required 
                 value={email} 
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-zinc-950/50 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-zinc-100 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50"
-                placeholder="colleague@company.com"
-              />
+                className="w-full bg-zinc-950/50 border border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-sm text-zinc-100 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 appearance-none"
+              >
+                <option value="" disabled>{isLoadingUsers ? "Loading users..." : "Select a user to invite"}</option>
+                {allUsers.map(u => (
+                  <option key={u._id} value={u.email}>
+                    {u.fullName || u.username} ({u.email})
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 

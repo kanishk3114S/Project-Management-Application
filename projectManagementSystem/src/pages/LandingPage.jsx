@@ -1,8 +1,11 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, LayoutTemplate, ShieldCheck, Activity } from "lucide-react";
 import Navbar from "../components/common/Navbar";
+import { useAuth } from "../context/AuthContext";
 
 export default function LandingPage() {
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-50 relative overflow-hidden">
       {/* Background Glow & Grid */}
@@ -28,10 +31,10 @@ export default function LandingPage() {
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
             <Link 
-              to="/register" 
+              to={user ? "/dashboard" : "/register"}
               className="group flex items-center gap-2 px-6 py-3 bg-zinc-100 hover:bg-white text-zinc-950 rounded-full font-medium transition-all shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:shadow-[0_0_25px_rgba(255,255,255,0.25)] hover:-translate-y-0.5"
             >
-              Start building
+              {user ? "Go to Dashboard" : "Start building"}
               <ArrowRight className="w-4 h-4 text-zinc-600 group-hover:text-zinc-900 transition-colors" />
             </Link>
             <a 

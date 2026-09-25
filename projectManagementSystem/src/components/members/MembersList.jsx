@@ -5,8 +5,9 @@ import { UserPlus, Shield, User, Trash2, Loader2 } from "lucide-react";
 import AddMemberModal from "./AddMemberModal";
 import MemberRoleDropdown from "./MemberRoleDropdown";
 
-export default function MembersList() {
-  const { projectId } = useParams();
+export default function MembersList({ projectId: propProjectId }) {
+  const { projectId: paramProjectId } = useParams();
+  const projectId = propProjectId || paramProjectId;
   const [members, setMembers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,7 +20,8 @@ export default function MembersList() {
         const response = await api.get(`/projects/${projectId}/members`);
         setMembers(Array.isArray(response.data.data) ? response.data.data : []);
       } catch (err) {
-        setError("Failed to load members");
+        console.error("Fetch members error:", err.response?.data || err);
+        setError(err.response?.data?.message || "Failed to load members");
       } finally {
         setIsLoading(false);
       }

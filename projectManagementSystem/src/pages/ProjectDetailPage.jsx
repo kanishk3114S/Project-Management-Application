@@ -64,15 +64,15 @@ export default function ProjectDetailPage() {
   const renderActiveTabContent = () => {
     switch (activeTab) {
       case "board":
-        return <ProjectBoard />;
+        return <ProjectBoard projectId={projectId} />;
       case "notes":
-        return <ProjectNotes />;
+        return <ProjectNotes projectId={projectId} />;
       case "members":
-        return <ProjectMembers />;
+        return <ProjectMembers projectId={projectId} />;
       case "settings":
-        return <ProjectSettings />;
+        return <ProjectSettings projectId={projectId} />;
       default:
-        return <ProjectBoard />;
+        return <ProjectBoard projectId={projectId} />;
     }
   };
 

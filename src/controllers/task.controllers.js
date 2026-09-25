@@ -46,7 +46,7 @@ const getTasks = AsyncHandler(async(req,res)=>{
         {
             $addFields: {
                 assignedTo: {
-                    $arrayElementAt: ["$assignedTo", 0]
+                    $arrayElemAt: ["$assignedTo", 0]
                 }
             }
         },
