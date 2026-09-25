@@ -38,6 +38,9 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await api.post('/auth/login', { email, password });
       setUser(response.data.data?.user);
+      if (response.data.data?.accessToken) {
+        localStorage.setItem('accessToken', response.data.data.accessToken);
+      }
       navigate("/dashboard");
       return response.data;
     } catch (error) {
@@ -74,6 +77,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error("Error logging out", error);
     } finally {
+      localStorage.removeItem('accessToken');
       setUser(null);
       navigate("/");
     }
