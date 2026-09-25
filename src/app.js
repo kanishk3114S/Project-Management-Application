@@ -10,6 +10,9 @@ import { ApiError } from "./utils/api-error.js"
 
 const app = express()
 
+// Trust the reverse proxy (Render) so secure cookies are sent correctly
+app.set("trust proxy", 1);
+
 //basic configurations//
 
 app.use(express.json({limit : "16kb"})); //converts the req json file to req.body.
