@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Triangle, Loader2, CheckCircle2 } from "lucide-react";
-
+import api from "../api/axios";
 export default function ResetPassword() {
   const { token } = useParams(); // Pre-backend, this is just for show
   const [password, setPassword] = useState("");
@@ -10,7 +10,7 @@ export default function ResetPassword() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -26,11 +26,14 @@ export default function ResetPassword() {
 
     setIsLoading(true);
 
-    // Mock API call
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await api.post(`/auth/reset-password/${token}`, { newPassword: password });
       setIsSuccess(true);
-    }, 1000);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to reset password.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

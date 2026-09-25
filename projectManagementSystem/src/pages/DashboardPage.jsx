@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useProjects } from "../context/ProjectContext";
+import { useToast } from "../context/ToastContext";
 import Navbar from "../components/common/Navbar";
 import { FolderGit2, Plus } from "lucide-react";
 import CreateProjectModal from "../components/projects/CreateProjectModal";
@@ -7,13 +9,13 @@ import ProjectCard from "../components/projects/ProjectCard";
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { projects, addProject } = useProjects();
+  const { addToast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  // Dummy Projects State (Starts completely empty now!)
-  const [projects, setProjects] = useState([]);
 
   const handleCreateProject = (newProject) => {
-    setProjects([newProject, ...projects]);
+    addProject(newProject);
+    addToast("Project created successfully!", "success");
   };
 
   return (
@@ -29,7 +31,7 @@ export default function DashboardPage() {
               </span>
             </div>
             <h1 className="text-3xl font-semibold tracking-tight text-white mb-1">Overview</h1>
-            <p className="text-sm text-zinc-400">Welcome back, {user?.name}. Here's what's happening.</p>
+            <p className="text-sm text-zinc-400">Welcome back, {user?.fullName || user?.username}. Here's what's happening.</p>
           </div>
           <button 
             onClick={() => setIsModalOpen(true)}
@@ -61,7 +63,7 @@ export default function DashboardPage() {
           /* Projects Grid */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {projects.map(project => (
-              <ProjectCard key={project.id} project={project} /> //RENDERS THE PROJECT CARD//
+              <ProjectCard key={project._id || project.id} project={project} /> //RENDERS THE PROJECT CARD//
             ))}
           </div>
         )}

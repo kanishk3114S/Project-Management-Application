@@ -17,7 +17,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      await login(email, password);
+      await login(email, password); {/*the function is passed on to the component and the email and password are taken via react --- input field and passed onto that as the states*/}
     } catch (err) {
       setError(err.message || "Invalid credentials. Please try again.");
     } finally {

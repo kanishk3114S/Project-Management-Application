@@ -38,7 +38,7 @@ const genAccessAndRefreshToken = async (userId) => { //means we have userId of t
 }
 
 const registerUser = AsyncHandler(async(req,res)=>{
-    console.log(req.body);
+    // console.log(req.body);
     const {email , username , password , role} = req.body
 
    const existingUser = await User.findOne({ //because database is always in another continent..//
@@ -93,11 +93,15 @@ const registerUser = AsyncHandler(async(req,res)=>{
 
 const newAccessAndRefreshToken = AsyncHandler(async(req,res)=>{
 
+    //we have taken the existing refreshToken//
+
     const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken 
 
     if (!refreshToken) {
         throw new ApiError(401 , "Refresh token is missing")
     }
+
+    //founded the User with that existingRefreshToken//
 
     const theUser = await User.findOne({refreshToken});
 
@@ -106,6 +110,8 @@ const newAccessAndRefreshToken = AsyncHandler(async(req,res)=>{
     }
 
     try {
+
+        //decoded contains the refreshToken//
 
         const decoded = jwt.verify(refreshToken , process.env.REFRESH_TOKEN_SECRET);
 
@@ -120,6 +126,8 @@ const newAccessAndRefreshToken = AsyncHandler(async(req,res)=>{
         }
 
         const {accessToken , refreshToken: newRefreshToken} = await genAccessAndRefreshToken(user._id);
+
+        //assign the new refresh and accessToken send to cookies and save the refresh token in the user Model itself//
 
         user.refreshToken = newRefreshToken;
         user.accessToken = accessToken;
@@ -343,12 +351,18 @@ export const forgotPasswordRequest = AsyncHandler(async(req,res)=>{
 
 export const resetForgotPassword = AsyncHandler(async(req,res)=>{
 
+    //that means user in the database but it got logged out .... so the user is requesting for the resetForgotPassword//
+    //first the ForgotPasswordRequest came------> gave him the token of the forgotPassword//
+    //now we recieve the token (from the forgotpassreq) + email via this request ...//
+
     const {resetToken} = req.params
     const {newPassword} = req.body
 
     if (!resetToken) {
         throw new ApiError(401 , "input field is Invalid")
     }
+
+    //hashedToken is the token u just stored via previous request and fetching by confirming it//
 
     const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex")
 
@@ -363,6 +377,8 @@ export const resetForgotPassword = AsyncHandler(async(req,res)=>{
 
     user.forgotPassExp = undefined;
     user.forgotPasswordToken = undefined;
+
+    //tokens arre removd ... obv//
 
     user.password = newPassword //our preHook will hash it instantly so no worries about 
 
@@ -411,4 +427,4 @@ export const changeCurrentPassword = AsyncHandler(async(req,res)=>{
 
 
 
-export {registerUser , Login , Logout , currUser , verifyEmail , resendVerificationEmail , newAccessAndRefreshToken};
+export {registerUser , Login , Logout , currUser , verifyEmail , resendVerificationEmail , newAccessAndRefreshToken};

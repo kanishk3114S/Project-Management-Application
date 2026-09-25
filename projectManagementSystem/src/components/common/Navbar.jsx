@@ -24,13 +24,41 @@ export default function Navbar() {
                 Dashboard
               </Link>
               <div className="w-[1px] h-4 bg-white/10"></div>
-              <span className="text-sm font-medium text-zinc-500">{user.name}</span>
-              <button 
-                onClick={logout}
-                className="text-sm font-medium text-zinc-400 hover:text-zinc-100 transition-colors"
-              >
-                Logout
-              </button>
+              
+              {/* User Dropdown */}
+              <div className="relative group">
+                <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                  <div className="w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-sm font-bold border border-indigo-500/30">
+                    {(user.fullName || user.username || 'U').charAt(0).toUpperCase()}
+                  </div>
+                </button>
+                
+                {/* Dropdown Menu (Hover based for clean vibe) */}
+                <div className="absolute right-0 mt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right translate-y-2 group-hover:translate-y-0">
+                  <div className="bg-zinc-900 border border-white/10 rounded-xl shadow-2xl overflow-hidden py-1">
+                    <div className="px-4 py-3 border-b border-white/5 bg-zinc-950/50">
+                      <p className="text-sm font-medium text-zinc-200 truncate">{user.fullName || user.username}</p>
+                      <p className="text-xs text-zinc-500 truncate">{user.email || 'user@example.com'}</p>
+                    </div>
+                    <div className="p-1">
+                      <Link to="/profile" className="block px-3 py-2 text-sm text-zinc-400 hover:text-zinc-100 hover:bg-white/5 rounded-md transition-colors">
+                        Profile Settings
+                      </Link>
+                      <Link to="/billing" className="block px-3 py-2 text-sm text-zinc-400 hover:text-zinc-100 hover:bg-white/5 rounded-md transition-colors">
+                        Billing & Plan
+                      </Link>
+                    </div>
+                    <div className="p-1 border-t border-white/5">
+                      <button 
+                        onClick={logout}
+                        className="w-full text-left px-3 py-2 text-sm text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-md transition-colors"
+                      >
+                        Log out
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </>
           ) : (
             <>

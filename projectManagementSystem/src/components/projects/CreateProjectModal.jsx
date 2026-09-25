@@ -8,24 +8,20 @@ export default function CreateProjectModal({ isOpen, onClose, onSubmit }) {
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Mock API call delay
-    setTimeout(() => {
-      setIsLoading(false);
-      onSubmit({
-        id: Math.random().toString(36).substring(7),
-        name,
-        description,
-        members: 1,
-        role: "admin",
-      });
+    try {
+      await onSubmit({ name, description });
       setName("");
       setDescription("");
       onClose();
-    }, 1000);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

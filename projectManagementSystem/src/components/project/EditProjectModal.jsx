@@ -16,16 +16,18 @@ export default function EditProjectModal({ isOpen, onClose, project, onSave }) {
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Mock API call delay
-    setTimeout(() => {
-      setIsLoading(false);
-      onSave({ ...project, name, description });
+    try {
+      await onSave({ ...project, name, description });
       onClose();
-    }, 1000);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

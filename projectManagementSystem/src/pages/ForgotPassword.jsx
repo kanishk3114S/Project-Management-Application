@@ -1,27 +1,26 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Triangle, Loader2, ArrowLeft, CheckCircle2 } from "lucide-react";
-
+import api from "../api/axios";
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSent, setIsSent] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
-    // Mock API call
-    setTimeout(() => {
+    try {
+      await api.post('/auth/forgot-password', { email });
+      setIsSent(true);
+    } catch (err) {
+      setError(err.response?.data?.message || "Something went wrong.");
+    } finally {
       setIsLoading(false);
-      if (email) {
-        setIsSent(true);
-      } else {
-        setError("Please enter a valid email address.");
-      }
-    }, 1000);
+    }
   };
 
   return (

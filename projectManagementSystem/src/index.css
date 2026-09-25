@@ -9,3 +9,13 @@
     @apply selection:bg-indigo-500/30 selection:text-indigo-100;
   }
 }
+
+@layer utilities {
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

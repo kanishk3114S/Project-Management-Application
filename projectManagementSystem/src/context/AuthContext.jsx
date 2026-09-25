@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../api/axios";
 
 const AuthContext = createContext();
 
@@ -10,56 +11,81 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Mock checking if user was already logged in (e.g., from localStorage)
+  // On initial load, check if the user has a valid session (cookie)
   useEffect(() => {
-    const storedUser = localStorage.getItem("mock_user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
+    const checkAuth = async () => {
+      try {
+        // Updated to match your backend route: /auth/currentUser
+        const response = await api.get('/auth/currentUser'); 
+        // Your backend uses ApiResponse structure: response.data.data.user
+        setUser(response.data.data?.user);
+      } catch (error) {
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
   }, []);
 
+
+  {/*login function which takes the email and password and gives the response data
+    if the res is valid ---> navigate(dashboard) else throw the errror that login is failed.
+    api.post('/auth/login')-----> send a http post request to the backend */}
+
   const login = async (email, password) => {
-    // MOCK LOGIN
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (email && password) {
-          const mockUser = { id: 1, name: "Test User", email, role: "admin" };
-          setUser(mockUser);
-          localStorage.setItem("mock_user", JSON.stringify(mockUser));
-          resolve(mockUser);
-          navigate("/dashboard");
-        } else {
-          reject(new Error("Invalid credentials"));
-        }
-      }, 1000); // simulate network delay
-    });
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      setUser(response.data.data?.user);
+      navigate("/dashboard");
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "Login failed");
+    }
   };
 
   const register = async (name, email, password) => {
-    // MOCK REGISTER
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (name && email && password) {
-          const mockUser = { id: 1, name, email, role: "admin" };
-          setUser(mockUser);
-          localStorage.setItem("mock_user", JSON.stringify(mockUser));
-          resolve(mockUser);
-          navigate("/dashboard");
-        } else {
-          reject(new Error("All fields are required"));
-        }
-      }, 1000);
-    });
+    try {
+      // Backend expects username, email, password. fullName is optional.
+      // We will remove spaces for the username and pass the original name as fullName
+      const formattedUsername = name.trim().replace(/\s+/g, '').toLowerCase() || email.split('@')[0];
+      
+      {/*object recieved as the response*/}
+
+      const response = await api.post('/auth/register', { 
+        username: formattedUsername, 
+        email, 
+        password,
+        fullName: name 
+      });
+      
+      setUser(response.data.data?.user);
+      navigate("/dashboard");
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "Registration failed");
+    }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("mock_user");
-    navigate("/");
+  const logout = async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch (error) {
+      console.error("Error logging out", error);
+    } finally {
+      setUser(null);
+      navigate("/");
+    }
   };
 
-  const value = {
+
+  {/* these are the functions which the auth provider provides */}
+  {/* these funciton take values and return the response */}
+
+  const value = { 
+
+
     user,
     loading,
     login,

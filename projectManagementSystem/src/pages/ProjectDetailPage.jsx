@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
+import { useProjects } from "../context/ProjectContext";
 import { ChevronLeft, Loader2 } from "lucide-react";
 import Navbar from "../components/common/Navbar";
 import ProjectHeader from "../components/project/ProjectHeader";
@@ -15,6 +16,8 @@ import ProjectSettings from "../components/project/ProjectSettings";
 export default function ProjectDetailPage() {
   const { projectId } = useParams(); //IT takes the user id from the params and takes the data//
   
+  const { projects, updateProject } = useProjects();
+  
   // State
   const [project, setProject] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -23,33 +26,38 @@ export default function ProjectDetailPage() {
   const [activeTab, setActiveTab] = useState("board");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  // Fetch project data (Mocking an API call for now)
+  // Fetch project data from context
   useEffect(() => {
     setIsLoading(true);
     
-    // Simulating network delay
+    // Small delay for UI smoothness
     const timer = setTimeout(() => {
       if (projectId) {
-        // Mock data fetch
-        setProject({
-          id: projectId,
-          name: "Project Workspace",
-          description: "This is a detailed view of your selected project workspace.",
-          members: 1
-        });
+        const found = projects.find(p => p._id === projectId || p.id === projectId);
+        if (found) {
+          setProject(found);
+          setError(null);
+        } else {
+          setError("Project not found. It may have been deleted.");
+        }
         setIsLoading(false);
       } else {
         setError("Project ID not found");
         setIsLoading(false);
       }
-    }, 800);
+    }, 400);
 
     return () => clearTimeout(timer);
-  }, [projectId]);
+  }, [projectId, projects]);
 
   // Update project locally after editing
-  const handleSaveProject = (updatedProject) => {
-    setProject(updatedProject);
+  const handleSaveProject = async (updatedProject) => {
+    try {
+      await updateProject(updatedProject._id || updatedProject.id, updatedProject);
+      setProject(updatedProject);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   // Conditional Rendering for active tab content
@@ -72,7 +80,7 @@ export default function ProjectDetailPage() {
     return (
       <div className="min-h-screen bg-zinc-950 text-zinc-50 flex flex-col">
         <Navbar />
-        <main className="flex-1 max-w-7xl w-full mx-auto px-6 pt-28 pb-12 flex items-center justify-center">
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 md:px-8 pt-32 pb-12 flex items-center justify-center">
           <Loader2 className="w-8 h-8 animate-spin text-zinc-500" />
         </main>
       </div>
@@ -83,7 +91,7 @@ export default function ProjectDetailPage() {
     return (
       <div className="min-h-screen bg-zinc-950 text-zinc-50 flex flex-col">
         <Navbar />
-        <main className="flex-1 max-w-7xl w-full mx-auto px-6 pt-28 pb-12">
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 md:px-8 pt-32 pb-12">
           <div className="text-red-400">{error}</div>
         </main>
       </div>
@@ -94,11 +102,11 @@ export default function ProjectDetailPage() {
     <div className="min-h-screen bg-zinc-950 text-zinc-50 flex flex-col">
       <Navbar />
       
-      <main className="flex-1 max-w-7xl w-full mx-auto px-6 pt-24 pb-12">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 md:px-8 pt-28 sm:pt-32 pb-12">
         {/* Back navigation */}
         <Link 
           to="/dashboard" 
-          className="inline-flex items-center gap-1 text-sm font-medium text-zinc-400 hover:text-zinc-200 transition-colors mb-6"
+          className="inline-flex items-center gap-1 text-sm font-medium text-zinc-400 hover:text-zinc-200 transition-colors mb-6 sm:mb-8"
         >
           <ChevronLeft className="w-4 h-4" />
           Back to Projects

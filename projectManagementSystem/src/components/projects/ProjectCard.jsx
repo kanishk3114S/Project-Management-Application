@@ -6,7 +6,7 @@ export default function ProjectCard({ project }) {
 
   return (
     <Link 
-      to={`/project/${project.id}`}
+      to={`/project/${project._id || project.id}`}
       className="group block bg-zinc-900/40 border border-white/5 border-t-white/10 rounded-2xl p-6 hover:-translate-y-1 hover:bg-zinc-900/80 hover:border-white/10 transition-all duration-300 backdrop-blur-sm"
     >
       <div className="flex justify-between items-start mb-4">

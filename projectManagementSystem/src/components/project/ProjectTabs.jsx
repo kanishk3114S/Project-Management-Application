@@ -9,8 +9,8 @@ export default function ProjectTabs({ activeTab, setActiveTab }) {
   ];
 
   return (
-    <div className="border-b border-white/5 mb-8">
-      <nav className="flex items-center gap-6">
+    <div className="border-b border-white/5 mb-8 w-full overflow-x-auto hide-scrollbar">
+      <nav className="flex items-center gap-6 min-w-max pb-[1px]">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
