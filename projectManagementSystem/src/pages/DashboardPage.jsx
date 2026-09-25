@@ -13,9 +13,14 @@ export default function DashboardPage() {
   const { addToast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleCreateProject = (newProject) => {
-    addProject(newProject);
-    addToast("Project created successfully!", "success");
+  const handleCreateProject = async (newProject) => {
+    try {
+      await addProject(newProject);
+      addToast("Project created successfully!", "success");
+      setIsModalOpen(false);
+    } catch (error) {
+      addToast(error.response?.data?.message || "Failed to create project", "error");
+    }
   };
 
   return (
