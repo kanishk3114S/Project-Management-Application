@@ -54,18 +54,18 @@ export const AuthProvider = ({ children }) => {
       // We will remove spaces for the username and pass the original name as fullName
       const formattedUsername = name.trim().replace(/\s+/g, '').toLowerCase() || email.split('@')[0];
       
-      {/*object recieved as the response*/}
+      {/*register the user first*/}
 
-      const response = await api.post('/auth/register', { 
+      await api.post('/auth/register', { 
         username: formattedUsername, 
         email, 
         password,
         fullName: name 
       });
       
-      setUser(response.data.data?.user);
-      navigate("/dashboard");
-      return response.data;
+      {/*auto-login after registration to get a valid accessToken,
+        because the register endpoint doesn't return tokens*/}
+      await login(email, password);
     } catch (error) {
       throw new Error(error.response?.data?.message || "Registration failed");
     }

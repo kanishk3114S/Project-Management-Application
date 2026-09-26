@@ -21,9 +21,21 @@ app.use(express.static("public")); //
 
 //cors configurations//
 
+// Parse CORS origin — handle "*" specially because credentials:true
+// forbids the literal wildcard "*" in Access-Control-Allow-Origin.
+// Using `origin: true` reflects the request's Origin header instead.
+const parseCorsOrigin = () => {
+  const envOrigin = process.env.CORS_ORIGIN;
+  if (!envOrigin || envOrigin.trim() === "*") {
+    return true; // reflects request origin — works with credentials
+  }
+  const origins = envOrigin.split(",").map((o) => o.trim()).filter(Boolean);
+  return origins.length === 1 ? origins[0] : origins;
+};
+
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN?.split(",") || ["http://localhost:5173"],
+    origin: parseCorsOrigin(),
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Authorization", "Content-Type"],
