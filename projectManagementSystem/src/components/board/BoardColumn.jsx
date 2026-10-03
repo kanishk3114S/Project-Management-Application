@@ -14,15 +14,15 @@ export default function BoardColumn({ title, status, tasks, onDrop, onTaskClick,
 
   return (
     <div 
-      className="flex-shrink-0 w-80 bg-zinc-100/80 dark:bg-zinc-950/40 rounded-2xl border border-zinc-200 dark:border-white/5 flex flex-col max-h-full"
+      className="flex-shrink-0 w-80 bg-[#EBE9E0]/80 dark:bg-zinc-950/40 rounded-3xl border-none dark:border-solid dark:border-white/5 flex flex-col max-h-full shadow-sm"
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
       {/* Column Header */}
-      <div className="p-4 border-b border-zinc-200 dark:border-white/5 flex items-center justify-between">
+      <div className="p-4 border-b border-stone-200/60 dark:border-white/5 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">{title}</h3>
-          <span className="bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-400 text-xs font-bold px-2 py-0.5 rounded-full">
+          <h3 className="text-sm font-semibold text-stone-900 dark:text-zinc-200">{title}</h3>
+          <span className="bg-white/60 dark:bg-zinc-800 text-stone-600 dark:text-zinc-400 text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
             {tasks.length}
           </span>
         </div>

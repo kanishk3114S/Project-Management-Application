@@ -8,10 +8,10 @@ export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl rounded-full border border-zinc-200/50 dark:border-white/5 bg-[#EBE9E0]/80 dark:bg-zinc-900/80 backdrop-blur-xl z-50 transition-colors duration-200">
+    <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl rounded-full border border-stone-200/60 dark:border-white/5 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl z-50 transition-colors duration-200 shadow-sm">
       <div className="px-6 h-14 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="w-6 h-6 rounded-md bg-[#1A4731] dark:bg-gradient-to-tr dark:from-indigo-500 dark:to-indigo-400 flex items-center justify-center">
+          <div className="w-6 h-6 rounded-md bg-[#1A4731] dark:bg-gradient-to-tr dark:from-indigo-500 dark:to-indigo-400 flex items-center justify-center shadow-sm">
             <Triangle className="w-3.5 h-3.5 text-white fill-current" strokeWidth={2} />
           </div>
           <span className="font-medium text-sm tracking-tight text-zinc-900 dark:text-zinc-100 group-hover:text-[#1A4731] dark:group-hover:text-indigo-500 transition-colors">

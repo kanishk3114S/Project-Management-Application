@@ -26,7 +26,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-950 px-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center  px-4 relative overflow-hidden">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-indigo-500/10 blur-[100px] rounded-full pointer-events-none" />
       
       <div className="w-full max-w-[400px] relative z-10">
@@ -34,11 +34,11 @@ export default function LoginPage() {
           <Link to="/" className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-tr from-indigo-500 to-indigo-400 mb-6 shadow-[0_0_20px_rgba(99,102,241,0.3)]">
             <Triangle className="w-5 h-5 text-white fill-current" strokeWidth={2} />
           </Link>
-          <h2 className="text-2xl font-semibold text-zinc-50 tracking-tight">Log in to ProjectCamp</h2>
-          <p className="text-sm text-zinc-400 mt-2">Welcome back to your workspace</p>
+          <h2 className="text-2xl font-semibold text-stone-900 dark:text-zinc-50 tracking-tight">Log in to ProjectCamp</h2>
+          <p className="text-sm text-stone-600 dark:text-zinc-400 mt-2">Welcome back to your workspace</p>
         </div>
 
-        <div className="bg-zinc-900/50 border border-white/5 border-t-white/10 rounded-2xl p-8 backdrop-blur-xl shadow-2xl">
+        <div className="bg-white dark:bg-zinc-900/50 border border-stone-200/60 dark:border-white/5 border-t-transparent dark:border-t-white/10 rounded-3xl shadow-sm p-8 backdrop-blur-xl shadow-2xl">
           {error && (
             <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg mb-6 text-sm flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
@@ -54,7 +54,7 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-zinc-950/50 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all placeholder:text-zinc-600"
+                className="w-full /50 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-stone-900 dark:text-zinc-100 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all placeholder:text-zinc-600"
                 placeholder="name@company.com"
               />
             </div>
@@ -71,7 +71,7 @@ export default function LoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-zinc-950/50 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all placeholder:text-zinc-600"
+                className="w-full /50 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-stone-900 dark:text-zinc-100 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all placeholder:text-zinc-600"
                 placeholder="••••••••"
               />
             </div>
@@ -85,9 +85,9 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-white/5 text-center text-sm text-zinc-500">
+          <div className="mt-8 pt-6 border-t border-white/5 text-center text-sm text-stone-500 dark:text-zinc-500">
             Don't have an account?{" "}
-            <Link to="/register" className="text-zinc-300 hover:text-white font-medium transition-colors">
+            <Link to="/register" className="text-stone-600 dark:text-zinc-300 hover:text-stone-900 dark:hover:text-white font-medium transition-colors">
               Sign up
             </Link>
           </div>

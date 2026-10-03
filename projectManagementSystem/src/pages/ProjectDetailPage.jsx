@@ -106,7 +106,7 @@ export default function ProjectDetailPage() {
         {/* Back navigation */}
         <Link 
           to="/dashboard" 
-          className="inline-flex items-center gap-1 text-sm font-medium text-zinc-400 hover:text-zinc-200 transition-colors mb-6 sm:mb-8"
+          className="inline-flex items-center gap-1 text-sm font-medium text-stone-500 dark:text-zinc-400 hover:text-stone-800 dark:hover:text-zinc-200 transition-colors mb-6 sm:mb-8"
         >
           <ChevronLeft className="w-4 h-4" />
           Back to Projects
