@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import { CheckCircle2, Circle, Trash2, ListCheck } from "lucide-react";
 import AddSubtaskInput from "./AddSubtaskInput";
 import api from "../../api/axios";
+import { useToast } from "../../context/ToastContext";
 
 export default function SubtaskList({ projectId, taskId, initialSubtasks = [], onSubtasksChange }) {
   const [subtasks, setSubtasks] = useState(initialSubtasks);
+  const { addToast } = useToast();
 
   useEffect(() => {
     setSubtasks(initialSubtasks);
@@ -29,6 +31,7 @@ export default function SubtaskList({ projectId, taskId, initialSubtasks = [], o
       console.error("Failed to toggle subtask:", err);
       // Revert if error
       updateParentState(subtasks);
+      addToast(err.response?.data?.message || "Failed to update subtask status", "error");
     }
   };
 
@@ -38,8 +41,10 @@ export default function SubtaskList({ projectId, taskId, initialSubtasks = [], o
       const newSubtask = response.data.data || response.data;
       const updated = [...subtasks, newSubtask];
       updateParentState(updated);
+      addToast("Subtask added successfully", "success");
     } catch (err) {
       console.error("Failed to add subtask:", err);
+      addToast(err.response?.data?.message || "Failed to add subtask", "error");
       throw err;
     }
   };
@@ -51,10 +56,12 @@ export default function SubtaskList({ projectId, taskId, initialSubtasks = [], o
 
     try {
       await api.delete(`/tasks/${projectId}/st/${subtaskId}`);
+      addToast("Subtask deleted", "success");
     } catch (err) {
       console.error("Failed to delete subtask:", err);
       // Revert if error
       updateParentState(subtasks);
+      addToast(err.response?.data?.message || "Failed to delete subtask", "error");
     }
   };
 

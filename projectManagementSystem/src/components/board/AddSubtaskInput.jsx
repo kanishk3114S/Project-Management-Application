@@ -32,7 +32,7 @@ export default function AddSubtaskInput({ onAdd }) {
       <button
         type="submit"
         disabled={!title.trim() || isAdding}
-        className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 shadow-sm shrink-0"
+        className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-medium transition-all disabled:opacity-50 flex items-center gap-1.5 shadow-sm shrink-0"
       >
         {isAdding ? (
           <Loader2 className="w-4 h-4 animate-spin" />
