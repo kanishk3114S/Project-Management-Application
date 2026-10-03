@@ -1,28 +1,34 @@
 import { useState, useEffect } from "react";
-import { CheckCircle2, Circle, Trash2 } from "lucide-react";
+import { CheckCircle2, Circle, Trash2, ListCheck } from "lucide-react";
 import AddSubtaskInput from "./AddSubtaskInput";
 import api from "../../api/axios";
 
-export default function SubtaskList({ projectId, taskId, initialSubtasks = [] }) {
+export default function SubtaskList({ projectId, taskId, initialSubtasks = [], onSubtasksChange }) {
   const [subtasks, setSubtasks] = useState(initialSubtasks);
 
   useEffect(() => {
     setSubtasks(initialSubtasks);
   }, [initialSubtasks]);
 
+  const updateParentState = (updatedList) => {
+    setSubtasks(updatedList);
+    if (onSubtasksChange) {
+      onSubtasksChange(updatedList);
+    }
+  };
+
   const handleToggle = async (subtaskId, currentStatus) => {
+    const updated = subtasks.map(st => 
+      st._id === subtaskId ? { ...st, isCompleted: !currentStatus } : st
+    );
+    updateParentState(updated);
+
     try {
-      // Optimistic
-      setSubtasks(prev =>
-        prev.map(st => (st._id === subtaskId ? { ...st, isCompleted: !currentStatus } : st))
-      );
       await api.put(`/tasks/${projectId}/st/${subtaskId}`, { isCompleted: !currentStatus });
     } catch (err) {
-      console.error(err);
-      // Revert
-      setSubtasks(prev =>
-        prev.map(st => (st._id === subtaskId ? { ...st, isCompleted: currentStatus } : st))
-      );
+      console.error("Failed to toggle subtask:", err);
+      // Revert if error
+      updateParentState(subtasks);
     }
   };
 
@@ -30,19 +36,25 @@ export default function SubtaskList({ projectId, taskId, initialSubtasks = [] })
     try {
       const response = await api.post(`/tasks/${projectId}/t/${taskId}/subtasks`, { title });
       const newSubtask = response.data.data || response.data;
-      setSubtasks([...subtasks, newSubtask]);
+      const updated = [...subtasks, newSubtask];
+      updateParentState(updated);
     } catch (err) {
-      console.error(err);
+      console.error("Failed to add subtask:", err);
+      throw err;
     }
   };
 
   const handleDelete = async (e, subtaskId) => {
     e.stopPropagation();
+    const updated = subtasks.filter(st => st._id !== subtaskId);
+    updateParentState(updated);
+
     try {
-      setSubtasks(prev => prev.filter(st => st._id !== subtaskId));
       await api.delete(`/tasks/${projectId}/st/${subtaskId}`);
     } catch (err) {
-      console.error(err);
+      console.error("Failed to delete subtask:", err);
+      // Revert if error
+      updateParentState(subtasks);
     }
   };
 
@@ -50,49 +62,67 @@ export default function SubtaskList({ projectId, taskId, initialSubtasks = [] })
   const progress = subtasks.length === 0 ? 0 : Math.round((completedCount / subtasks.length) * 100);
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4 bg-zinc-950/40 dark:bg-zinc-950/40 light:bg-zinc-50/80 p-4 rounded-xl border border-white/5 dark:border-white/5 light:border-zinc-200">
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-medium text-zinc-200">Sub-tasks</h4>
-        <span className="text-xs text-zinc-500">{completedCount} / {subtasks.length} ({progress}%)</span>
+        <div className="flex items-center gap-2 text-sm font-semibold text-zinc-200 dark:text-zinc-200 light:text-zinc-800">
+          <ListCheck className="w-4 h-4 text-indigo-400" />
+          <span>Sub-tasks</span>
+        </div>
+        <span className="text-xs font-medium text-zinc-400 dark:text-zinc-400 light:text-zinc-500">
+          {completedCount} of {subtasks.length} completed ({progress}%)
+        </span>
       </div>
 
       {/* Progress Bar */}
-      <div className="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
+      <div className="h-2 w-full bg-zinc-800 dark:bg-zinc-800 light:bg-zinc-200 rounded-full overflow-hidden">
         <div 
-          className="h-full bg-indigo-500 transition-all duration-300 ease-in-out" 
+          className="h-full bg-gradient-to-r from-indigo-500 to-indigo-400 transition-all duration-300 ease-out" 
           style={{ width: `${progress}%` }}
         />
       </div>
 
-      <div className="space-y-2 mt-4">
-        {subtasks.map((st) => (
-          <div 
-            key={st._id} 
-            onClick={() => handleToggle(st._id, st.isCompleted)}
-            className="flex items-start justify-between p-2 hover:bg-white/5 rounded-lg cursor-pointer group transition-colors"
-          >
-            <div className="flex items-start gap-3">
-              <button className="mt-0.5 text-zinc-500 group-hover:text-indigo-400 transition-colors">
-                {st.isCompleted ? (
-                  <CheckCircle2 className="w-4 h-4 text-indigo-500" />
-                ) : (
-                  <Circle className="w-4 h-4" />
-                )}
-              </button>
-              <span className={`text-sm ${st.isCompleted ? 'text-zinc-500 line-through' : 'text-zinc-300'}`}>
-                {st.title}
-              </span>
-            </div>
-            <button 
-              onClick={(e) => handleDelete(e, st._id)}
-              className="text-zinc-500 opacity-0 group-hover:opacity-100 hover:text-rose-400 transition-all"
+      {/* Subtasks List */}
+      <div className="space-y-1.5 mt-3 max-h-60 overflow-y-auto hide-scrollbar">
+        {subtasks.length === 0 ? (
+          <p className="text-xs text-zinc-500 dark:text-zinc-500 light:text-zinc-400 py-2 italic text-center">
+            No sub-tasks added yet. Add one below!
+          </p>
+        ) : (
+          subtasks.map((st) => (
+            <div 
+              key={st._id} 
+              onClick={() => handleToggle(st._id, st.isCompleted)}
+              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-zinc-100 cursor-pointer group transition-colors border border-transparent hover:border-white/5 dark:hover:border-white/5 light:hover:border-zinc-200"
             >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          </div>
-        ))}
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <button 
+                  type="button"
+                  className="text-zinc-500 group-hover:text-indigo-400 transition-colors shrink-0"
+                >
+                  {st.isCompleted ? (
+                    <CheckCircle2 className="w-4 h-4 text-indigo-500" />
+                  ) : (
+                    <Circle className="w-4 h-4 text-zinc-500" />
+                  )}
+                </button>
+                <span className={`text-sm truncate ${st.isCompleted ? 'text-zinc-500 dark:text-zinc-500 light:text-zinc-400 line-through' : 'text-zinc-200 dark:text-zinc-200 light:text-zinc-800 font-medium'}`}>
+                  {st.title}
+                </span>
+              </div>
+              <button 
+                type="button"
+                onClick={(e) => handleDelete(e, st._id)}
+                className="text-zinc-500 hover:text-rose-400 p-1 opacity-0 group-hover:opacity-100 transition-all rounded"
+                title="Delete subtask"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          ))
+        )}
       </div>
 
+      {/* Add Subtask Input Form */}
       <AddSubtaskInput onAdd={handleAdd} />
     </div>
   );

@@ -4,7 +4,7 @@ import api from "../../api/axios";
 import BoardColumn from "./BoardColumn";
 import TaskModal from "./TaskModal";
 import TaskDetailModal from "./TaskDetailModal";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 
 export default function Board({ projectId: propProjectId }) {
   const { projectId: paramProjectId } = useParams();
@@ -17,7 +17,6 @@ export default function Board({ projectId: propProjectId }) {
     const fetchTasks = async () => {
       try {
         const response = await api.get(`/tasks/${projectId}`);
-        // Backend returns response.data.data
         setTasks(Array.isArray(response.data.data) ? response.data.data : []);
       } catch (err) {
         console.error("Fetch tasks error:", err.response?.data || err);
@@ -35,15 +34,23 @@ export default function Board({ projectId: propProjectId }) {
   const [selectedTask, setSelectedTask] = useState(null);
   const [defaultStatusForNewTask, setDefaultStatusForNewTask] = useState("todo");
 
+  // Sync task changes (e.g. subtasks, status) across Board state and selectedTask
+  const handleTaskUpdate = (updatedTask) => {
+    setSelectedTask(updatedTask);
+    setTasks((prevTasks) =>
+      prevTasks.map((t) => (t._id === updatedTask._id ? updatedTask : t))
+    );
+  };
+
   // Drag and Drop Handlers
   const handleDrop = async (e, newStatus) => {
     const taskId = e.dataTransfer.getData("taskId");
-    const task = tasks.find(t => t._id === taskId);
+    const task = tasks.find((t) => t._id === taskId);
     if (!task || task.status === newStatus) return;
 
     // Optimistic UI Update
-    setTasks(prevTasks => 
-      prevTasks.map(t => t._id === taskId ? { ...t, status: newStatus } : t)
+    setTasks((prevTasks) =>
+      prevTasks.map((t) => (t._id === taskId ? { ...t, status: newStatus } : t))
     );
 
     try {
@@ -51,14 +58,14 @@ export default function Board({ projectId: propProjectId }) {
     } catch (err) {
       console.error("Failed to update status", err);
       // Revert if failed
-      setTasks(prevTasks => 
-        prevTasks.map(t => t._id === taskId ? { ...t, status: task.status } : t)
+      setTasks((prevTasks) =>
+        prevTasks.map((t) => (t._id === taskId ? { ...t, status: task.status } : t))
       );
     }
   };
 
   // Task Actions
-  const handleAddTaskClick = (status) => {
+  const handleAddTaskClick = (status = "todo") => {
     setSelectedTask(null);
     setDefaultStatusForNewTask(status);
     setIsFormModalOpen(true);
@@ -76,7 +83,7 @@ export default function Board({ projectId: propProjectId }) {
 
   const handleDeleteTask = async (taskId) => {
     try {
-      setTasks(prev => prev.filter(t => t._id !== taskId));
+      setTasks((prev) => prev.filter((t) => t._id !== taskId));
       await api.delete(`/tasks/${projectId}/t/${taskId}`);
       setIsDetailModalOpen(false);
     } catch (err) {
@@ -98,14 +105,14 @@ export default function Board({ projectId: propProjectId }) {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         const updatedTask = response.data.data || response.data;
-        setTasks(prev => prev.map(t => t._id === updatedTask._id ? updatedTask : t));
+        setTasks((prev) => prev.map((t) => (t._id === updatedTask._id ? { ...t, ...updatedTask } : t)));
       } else {
         // Create
         const response = await api.post(`/tasks/${projectId}`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         const newTask = response.data.data || response.data;
-        setTasks(prev => [newTask, ...prev]);
+        setTasks((prev) => [newTask, ...prev]);
       }
       setIsFormModalOpen(false);
     } catch (err) {
@@ -113,23 +120,34 @@ export default function Board({ projectId: propProjectId }) {
     }
   };
 
-  if (isLoading) return <div className="h-full flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-zinc-500" /></div>;
-  if (error) return <div className="text-rose-400 p-4">{error}</div>;
+  if (isLoading) return (
+    <div className="h-full flex items-center justify-center p-12">
+      <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+    </div>
+  );
+
+  if (error) return (
+    <div className="text-rose-400 p-6 bg-rose-500/10 rounded-xl border border-rose-500/20 m-4">
+      {error}
+    </div>
+  );
 
   return (
     <div className="h-full flex flex-col">
       {/* Board Header with Add Task Button */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-lg font-medium text-zinc-100">Task Board</h2>
-          <p className="text-sm text-zinc-500">Manage and track your project tasks.</p>
+          <h2 className="text-xl font-bold text-zinc-100 dark:text-zinc-100 light:text-zinc-900">Task Board</h2>
+          <p className="text-xs text-zinc-400 dark:text-zinc-400 light:text-zinc-500">
+            Click any task card to manage description and sub-tasks.
+          </p>
         </div>
         <button 
           onClick={() => handleAddTaskClick("todo")}
-          className="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center gap-2"
+          className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm flex items-center gap-1.5"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-          Add Task
+          <Plus className="w-4 h-4" />
+          <span>Add Task</span>
         </button>
       </div>
 
@@ -137,7 +155,7 @@ export default function Board({ projectId: propProjectId }) {
         <BoardColumn 
           title="To Do" 
           status="todo" 
-          tasks={tasks.filter(t => t.status === "todo")}
+          tasks={tasks.filter((t) => t.status === "todo")}
           onDrop={handleDrop}
           onTaskClick={handleTaskClick}
           onAddTask={handleAddTaskClick}
@@ -145,7 +163,7 @@ export default function Board({ projectId: propProjectId }) {
         <BoardColumn 
           title="In Progress" 
           status="in_progress" 
-          tasks={tasks.filter(t => t.status === "in_progress")}
+          tasks={tasks.filter((t) => t.status === "in_progress")}
           onDrop={handleDrop}
           onTaskClick={handleTaskClick}
           onAddTask={handleAddTaskClick}
@@ -153,7 +171,7 @@ export default function Board({ projectId: propProjectId }) {
         <BoardColumn 
           title="Done" 
           status="done" 
-          tasks={tasks.filter(t => t.status === "done")}
+          tasks={tasks.filter((t) => t.status === "done")}
           onDrop={handleDrop}
           onTaskClick={handleTaskClick}
           onAddTask={handleAddTaskClick}
@@ -175,6 +193,7 @@ export default function Board({ projectId: propProjectId }) {
           task={selectedTask}
           onEdit={handleEditClick}
           onDelete={handleDeleteTask}
+          onTaskUpdate={handleTaskUpdate}
         />
       )}
     </div>

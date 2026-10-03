@@ -1,23 +1,29 @@
-import { X, Trash2, Edit2, AlignLeft, User, Flag } from "lucide-react";
+import { X, Trash2, Edit2, AlignLeft } from "lucide-react";
 import { useParams } from "react-router-dom";
 import SubtaskList from "./SubtaskList";
 
-export default function TaskDetailModal({ isOpen, onClose, task, onDelete, onEdit }) {
+export default function TaskDetailModal({ isOpen, onClose, task, onDelete, onEdit, onTaskUpdate }) {
   const { projectId } = useParams();
 
   if (!isOpen || !task) return null;
 
+  const handleSubtasksChange = (updatedSubtasks) => {
+    if (onTaskUpdate) {
+      onTaskUpdate({ ...task, subtasks: updatedSubtasks });
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/75 backdrop-blur-md" onClick={onClose} />
       
-      <div className="relative w-full max-w-2xl max-h-[90vh] bg-zinc-900 border border-white/10 rounded-2xl shadow-2xl flex flex-col animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-2xl max-h-[90vh] bg-zinc-900 dark:bg-zinc-900 light:bg-white border border-white/10 dark:border-white/10 light:border-zinc-200 rounded-2xl shadow-2xl flex flex-col animate-in fade-in zoom-in-95 duration-200">
         
         {/* Header Actions */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 dark:border-white/5 light:border-zinc-100 shrink-0">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">
-              {task.status.replace("_", " ")}
+            <span className="text-xs uppercase tracking-wider font-bold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 dark:text-indigo-400 light:text-indigo-600 border border-indigo-500/20">
+              {task.status?.replace("_", " ")}
             </span>
           </div>
           <div className="flex items-center gap-1">
@@ -35,36 +41,37 @@ export default function TaskDetailModal({ isOpen, onClose, task, onDelete, onEdi
             >
               <Trash2 className="w-4 h-4" />
             </button>
-            <div className="w-px h-4 bg-white/10 mx-1" />
-            <button onClick={onClose} className="p-2 text-zinc-400 hover:text-zinc-200 hover:bg-white/5 rounded-lg transition-colors">
+            <div className="w-px h-4 bg-white/10 dark:bg-white/10 light:bg-zinc-200 mx-1" />
+            <button onClick={onClose} className="p-2 text-zinc-400 hover:text-zinc-200 light:hover:text-zinc-900 hover:bg-white/5 light:hover:bg-zinc-100 rounded-lg transition-colors">
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
         {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-y-auto hide-scrollbar p-6">
-          <h2 className="text-xl sm:text-2xl font-semibold text-zinc-100 mb-6">{task.title}</h2>
+        <div className="flex-1 overflow-y-auto hide-scrollbar p-6 space-y-6">
+          <h2 className="text-xl sm:text-2xl font-semibold text-zinc-100 dark:text-zinc-100 light:text-zinc-900 leading-tight">
+            {task.title}
+          </h2>
           
-          <div className="space-y-8">
-            {/* Description */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-sm font-medium text-zinc-200">
-                <AlignLeft className="w-4 h-4 text-zinc-400" />
-                Description
-              </div>
-              <div className="text-sm text-zinc-400 leading-relaxed bg-zinc-950/30 p-4 rounded-xl border border-white/5">
-                {task.description || "No description provided."}
-              </div>
+          {/* Description */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-xs font-semibold text-zinc-400 dark:text-zinc-400 light:text-zinc-500 uppercase tracking-wider">
+              <AlignLeft className="w-4 h-4 text-indigo-400" />
+              Description
             </div>
-
-            {/* Subtasks Component */}
-            <SubtaskList 
-              projectId={projectId} 
-              taskId={task._id} 
-              initialSubtasks={task.subtasks || []} 
-            />
+            <div className="text-sm text-zinc-300 dark:text-zinc-300 light:text-zinc-700 leading-relaxed bg-zinc-950/40 dark:bg-zinc-950/40 light:bg-zinc-50 p-4 rounded-xl border border-white/5 dark:border-white/5 light:border-zinc-200">
+              {task.description || "No description provided for this task."}
+            </div>
           </div>
+
+          {/* Subtasks Component */}
+          <SubtaskList 
+            projectId={projectId} 
+            taskId={task._id} 
+            initialSubtasks={task.subtasks || []} 
+            onSubtasksChange={handleSubtasksChange}
+          />
         </div>
       </div>
     </div>
