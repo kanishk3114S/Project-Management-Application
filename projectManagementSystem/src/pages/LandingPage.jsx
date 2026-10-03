@@ -7,7 +7,7 @@ export default function LandingPage() {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-50 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col  relative overflow-hidden">
       {/* Background Glow & Grid */}
       <div className="absolute inset-0 bg-[url('https://res.cloudinary.com/djpkzt2k2/image/upload/v1701389710/grid-pattern_q5mvk8.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-20 pointer-events-none" />
       <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-indigo-500/20 blur-[120px] rounded-full pointer-events-none" />

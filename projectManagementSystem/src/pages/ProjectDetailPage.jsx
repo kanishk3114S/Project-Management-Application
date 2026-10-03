@@ -78,7 +78,7 @@ export default function ProjectDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-zinc-950 text-zinc-50 flex flex-col">
+      <div className="min-h-screen  flex flex-col">
         <Navbar />
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 md:px-8 pt-32 pb-12 flex items-center justify-center">
           <Loader2 className="w-8 h-8 animate-spin text-zinc-500" />
@@ -89,7 +89,7 @@ export default function ProjectDetailPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-zinc-950 text-zinc-50 flex flex-col">
+      <div className="min-h-screen  flex flex-col">
         <Navbar />
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 md:px-8 pt-32 pb-12">
           <div className="text-red-400">{error}</div>
@@ -99,7 +99,7 @@ export default function ProjectDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-50 flex flex-col">
+    <div className="min-h-screen  flex flex-col">
       <Navbar />
       
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 md:px-8 pt-28 sm:pt-32 pb-12">
