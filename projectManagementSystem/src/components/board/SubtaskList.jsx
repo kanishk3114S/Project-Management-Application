@@ -62,19 +62,19 @@ export default function SubtaskList({ projectId, taskId, initialSubtasks = [], o
   const progress = subtasks.length === 0 ? 0 : Math.round((completedCount / subtasks.length) * 100);
 
   return (
-    <div className="space-y-4 bg-zinc-950/40 dark:bg-zinc-950/40 light:bg-zinc-50/80 p-4 rounded-xl border border-white/5 dark:border-white/5 light:border-zinc-200">
+    <div className="space-y-4 bg-zinc-50 dark:bg-zinc-950/40 p-4 rounded-xl border border-zinc-200 dark:border-white/5">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm font-semibold text-zinc-200 dark:text-zinc-200 light:text-zinc-800">
-          <ListCheck className="w-4 h-4 text-indigo-400" />
+        <div className="flex items-center gap-2 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+          <ListCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
           <span>Sub-tasks</span>
         </div>
-        <span className="text-xs font-medium text-zinc-400 dark:text-zinc-400 light:text-zinc-500">
+        <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
           {completedCount} of {subtasks.length} completed ({progress}%)
         </span>
       </div>
 
       {/* Progress Bar */}
-      <div className="h-2 w-full bg-zinc-800 dark:bg-zinc-800 light:bg-zinc-200 rounded-full overflow-hidden">
+      <div className="h-2 w-full bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
         <div 
           className="h-full bg-gradient-to-r from-indigo-500 to-indigo-400 transition-all duration-300 ease-out" 
           style={{ width: `${progress}%` }}
@@ -84,7 +84,7 @@ export default function SubtaskList({ projectId, taskId, initialSubtasks = [], o
       {/* Subtasks List */}
       <div className="space-y-1.5 mt-3 max-h-60 overflow-y-auto hide-scrollbar">
         {subtasks.length === 0 ? (
-          <p className="text-xs text-zinc-500 dark:text-zinc-500 light:text-zinc-400 py-2 italic text-center">
+          <p className="text-xs text-zinc-400 dark:text-zinc-500 py-2 italic text-center">
             No sub-tasks added yet. Add one below!
           </p>
         ) : (
@@ -92,27 +92,27 @@ export default function SubtaskList({ projectId, taskId, initialSubtasks = [], o
             <div 
               key={st._id} 
               onClick={() => handleToggle(st._id, st.isCompleted)}
-              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-white/5 dark:hover:bg-white/5 light:hover:bg-zinc-100 cursor-pointer group transition-colors border border-transparent hover:border-white/5 dark:hover:border-white/5 light:hover:border-zinc-200"
+              className="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-white/5 cursor-pointer group transition-colors border border-transparent hover:border-zinc-200 dark:hover:border-white/5"
             >
               <div className="flex items-center gap-3 min-w-0 flex-1">
                 <button 
                   type="button"
-                  className="text-zinc-500 group-hover:text-indigo-400 transition-colors shrink-0"
+                  className="text-zinc-400 dark:text-zinc-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors shrink-0"
                 >
                   {st.isCompleted ? (
-                    <CheckCircle2 className="w-4 h-4 text-indigo-500" />
+                    <CheckCircle2 className="w-4 h-4 text-indigo-600 dark:text-indigo-500" />
                   ) : (
-                    <Circle className="w-4 h-4 text-zinc-500" />
+                    <Circle className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
                   )}
                 </button>
-                <span className={`text-sm truncate ${st.isCompleted ? 'text-zinc-500 dark:text-zinc-500 light:text-zinc-400 line-through' : 'text-zinc-200 dark:text-zinc-200 light:text-zinc-800 font-medium'}`}>
+                <span className={`text-sm truncate ${st.isCompleted ? 'text-zinc-400 dark:text-zinc-500 line-through' : 'text-zinc-800 dark:text-zinc-200 font-medium'}`}>
                   {st.title}
                 </span>
               </div>
               <button 
                 type="button"
                 onClick={(e) => handleDelete(e, st._id)}
-                className="text-zinc-500 hover:text-rose-400 p-1 opacity-0 group-hover:opacity-100 transition-all rounded"
+                className="text-zinc-400 dark:text-zinc-500 hover:text-rose-500 dark:hover:text-rose-400 p-1 opacity-0 group-hover:opacity-100 transition-all rounded"
                 title="Delete subtask"
               >
                 <Trash2 className="w-4 h-4" />
