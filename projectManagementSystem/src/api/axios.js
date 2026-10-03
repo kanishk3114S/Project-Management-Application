@@ -48,9 +48,17 @@ api.interceptors.response.use(
           return api(originalRequest); // retry with fresh token
         }
       } catch (refreshError) {
-        // Refresh failed — session is dead, force re-login
+        // Refresh failed — session is dead, clear token
         localStorage.removeItem('accessToken');
-        window.location.href = '/login';
+        
+        // Only force redirect if on a protected route to avoid infinite loops on public pages
+        const publicRoutes = ['/login', '/register', '/', '/forgot-password'];
+        const isPublicRoute = publicRoutes.includes(window.location.pathname) || window.location.pathname.startsWith('/reset-password');
+        
+        if (!isPublicRoute) {
+          window.location.href = '/login';
+        }
+        
         return Promise.reject(refreshError);
       }
     }
