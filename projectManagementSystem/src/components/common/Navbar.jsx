@@ -8,13 +8,13 @@ export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <nav className="fixed top-0 w-full border-b border-zinc-200 dark:border-white/5 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl z-50 transition-colors duration-200">
-      <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
+    <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl rounded-full border border-zinc-200/50 dark:border-white/5 bg-[#EBE9E0]/80 dark:bg-zinc-900/80 backdrop-blur-xl z-50 transition-colors duration-200">
+      <div className="px-6 h-14 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="w-6 h-6 rounded-md bg-gradient-to-tr from-indigo-500 to-indigo-400 flex items-center justify-center shadow-[0_0_15px_rgba(99,102,241,0.4)]">
+          <div className="w-6 h-6 rounded-md bg-[#1A4731] dark:bg-gradient-to-tr dark:from-indigo-500 dark:to-indigo-400 flex items-center justify-center">
             <Triangle className="w-3.5 h-3.5 text-white fill-current" strokeWidth={2} />
           </div>
-          <span className="font-medium text-sm tracking-tight text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-500 transition-colors">
+          <span className="font-medium text-sm tracking-tight text-zinc-900 dark:text-zinc-100 group-hover:text-[#1A4731] dark:group-hover:text-indigo-500 transition-colors">
             ProjectCamp
           </span>
         </Link>
@@ -80,7 +80,7 @@ export default function Navbar() {
               </Link>
               <Link 
                 to="/register" 
-                className="text-sm font-medium px-4 py-1.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white transition-all shadow-sm hover:scale-105"
+                className="text-sm font-medium px-4 py-1.5 rounded-full bg-[#1A4731] hover:bg-[#113021] dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white transition-all shadow-sm hover:scale-105"
               >
                 Sign up
               </Link>
